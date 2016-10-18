@@ -62,11 +62,11 @@ for i in xrange(1000):
                 chi22[ind] += (pmodchi2)
                 count2[ind] += 1
 
-y = chi22/count2 - chi21/count1
+y = chi21/count1 - chi22/count2
 for i,val in enumerate(y):
     if np.isnan(val): y[i] = 0
 p.plot(pwave, y)
 p.axis([pwave[0], pwave[-1], min(y)*2, max(y)*1.2])
 p.xlabel(r'Rest frame wavelength ($\AA$)', size=14)
-p.ylabel(r'$\overline{(S/N)^2-\chi^2}/$ pixel')
-p.savefig('../../plots/sn-poly.pdf')
+p.ylabel(r'$\overline{\chi2_{zw=0}^2-\chi_{zw=4}^2}/$ pixel')
+p.savefig('../../plots/chi2_zwarning_diff.pdf')
