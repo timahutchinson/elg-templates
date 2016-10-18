@@ -90,3 +90,6 @@ ENV/
 
 # PDFs
 #*.pdf
+
+# Ignore emacs backup files
+*~
