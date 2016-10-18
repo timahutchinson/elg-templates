@@ -4,6 +4,7 @@ from os.path import exists, join
 import numpy as np
 from scipy import linalg
 from astropy.io import fits
+import matplotlib.pyplot as p
 
 from redmonster.physics.misc import poly_array
 
