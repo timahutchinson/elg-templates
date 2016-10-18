@@ -27,7 +27,7 @@ chi2 = np.zeros(10000)
 
 for i in xrange(1000):
     print i
-    if hdu[1].data.ZWARNING[i] == 0:
+    if hdu[1].data.ZWARNING[i] & 4:
         if hdu[1].data.CLASS1[i] == 'ssp_galaxy_glob':
             spec = hduplate[0].data[i]
             ivar = hduplate[1].data[i]
@@ -50,4 +50,4 @@ p.plot(pwave, y)
 p.axis([pwave[0], pwave[-1], min(y)*2, max(y)*1.2])
 p.xlabel(r'Rest frame wavelength ($\AA$)', size=14)
 p.ylabel(r'$\overline{(S/N)^2-\chi^2}/$ pixel')
-p.savefig('../../plots/sn-poly.pdf')
+p.savefig('../../plots/sn-poly_zwarning.pdf')
