@@ -11,7 +11,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from redmonster.datamgr.io import read_ndArch
+from redmonster.datamgr.io2 import read_ndArch
 
 version = 'v5_10_0'
 platedir = join( environ['REDMONSTER_SPECTRO_REDUX'], '%s_poly1' % version, '*' )
