@@ -17,7 +17,7 @@ plates = {8123:56931}
 rmver = 'v1_1_0'
 
 # chi2 threshold to use in set cover distance matrix
-mindist = 0.9
+mindist = 0.5
 
 rmdir = join( environ['REDMONSTER_SPECTRO_REDUX'], environ['RUN2D'],
              '%s' % rmver)
@@ -67,7 +67,7 @@ for plate in plates.keys():
         low1 = np.abs(wave1-4500).argmin()
         mean1 = np.mean(data1[low1:high1+1])
         data1 /= mean1
-        sigma1 *= mean1
+        sigma1 *= mean1**2
         # loop over upper half of matrix and fill bottom half with symmetry
         for j in range(i, len(fibers)):
             fiber2 = fibers[j]
@@ -104,7 +104,7 @@ for plate in plates.keys():
             high2 = np.abs(wave2-4700).argmin()
             mean2 = np.mean(data2[low2:high2+1])
             data2 /= mean2
-            sigma2 *= mean2
+            sigma2 *= mean2**2
             # convert inverse variance to sigma squared and add in quadrature
             variance = (1/sigma1_2) + (1/sigma2)
             # calculate reduced chi2 as distance
