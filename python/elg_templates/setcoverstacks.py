@@ -17,7 +17,7 @@ plates = {8123:56931}
 rmver = 'v1_1_0'
 
 # chi2 threshold to use in set cover distance matrix
-mindist = 0.5
+mindist = 0.48
 
 rmdir = join( environ['REDMONSTER_SPECTRO_REDUX'], environ['RUN2D'],
              '%s' % rmver)
@@ -115,10 +115,11 @@ for plate in plates.keys():
     print " "
     binmat = distmat < mindist
     cost = np.ones(binmat.shape[0])
+    #cost = 1 / hdu
 
     g = setcover.SetCover(binmat, cost)
-    g.greedy()
-    #g.SolveSCP()
+    #g.greedy()
+    g.SolveSCP()
 
     # Get the archetype indices
     iarchetype = np.nonzero(g.s)[0]
@@ -129,10 +130,38 @@ for plate in plates.keys():
     for i,arch in enumerate(iarchetype):
         print "Archtype #%s represents %s spectra." % (arch, n_rep[i])
 
+    # Get instances represented by each archetype
+    stacks = [] # place to store stacks
+    all_counts = []
+    restwave = 10**(2.6990 + np.arange(20000) * 0.0001)
+    for i in xrange(iarchetype.size):
+        if n_rep[i] > 1:
+            this_stack = np.zeros(20000)
+            counts = np.zeros(20000)
+            # binary vector of which spectra are represented by this archetype
+            itmp = binmat[:, iarchetype[i]]
+            # list of fiber numbers represented
+            fibrep = np.asarray(fibers)[itmp]
+            for fiber in fibrep:
+                fiberind = np.where((np.asarray(fibers)-fiber) == 0)[0][0]
+                fiberlen = hduidl[0].data[fiber-1].shape[-1]
+                this_wave = wave / (1 + zs[fiberind])
+                wave0 = np.abs(restwave - this_wave[0]).argmin()
+                this_stack[wave0:wave0+fiberlen] += hduidl[0].data[fiber-1]
+                counts[wave0:wave0+fiberlen] += 1
+            this_stack /= counts
+            stacks.append(this_stack)
+            all_counts.append(counts)
 
-
-
-
+    # Crop stacks to regions with at least XXX% of max counts
+    mastercounts = []
+    masterstacks = []
+    masterwave = []
+    for i,counts in enumerate(all_counts):
+        w = (counts >= (0.3*np.max(counts)))
+        mastercounts.append(counts[w])
+        masterstacks.append(stacks[i][w])
+        masterwave.append(restwave[w])
 
 
 
