@@ -1,3 +1,5 @@
+import numpy as np
+
 __linelist__ = {
                 'OII_1' : 3727.09,
                 'OII_2' : 3729.88,
@@ -23,3 +25,11 @@ __linelist__ = {
                 'SII_2' : 6718.29,
                 'SII_3' : 6732.67
                 }
+
+def create_mask(lines, wave):
+    wave = np.array(wave)
+    mask = np.ones(wave.shape[0])
+    for line in lines.values():
+        loc = np.abs(wave-line).argmin()
+        mask[loc-5:loc+5] = 0
+    return mask
