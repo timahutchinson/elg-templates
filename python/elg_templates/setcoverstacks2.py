@@ -11,13 +11,13 @@ from astropy.io import fits
 from redmonster.datamgr.io2 import read_ndArch
 
 # Dict of plates and corresponding MJDS
-plates = {8123:56931}
+plates = {6932:56397}
 
 # version of redmonster reductions to use
 rmver = 'v1_1_0'
 
 # chi2 threshold to use in set cover distance matrix
-mindist = 0.48
+mindist = .9
 
 rmdir = join( environ['REDMONSTER_SPECTRO_REDUX'], environ['RUN2D'],
              '%s' % rmver)
@@ -28,8 +28,11 @@ for plate in plates.keys():
     fibers = []
     zs = []
     # open redmonster file
-    hdu = fits.open( join( rmdir, '%s' % plate, 'redmonster-%s-%s.fits'
-                          % (plate, plates[plate]) ) )
+    #hdu = fits.open( join( rmdir, '%s' % plate, 'redmonster-%s-%s.fits'
+    #% (plate, plates[plate]) ) )
+    hdu = fits.open( join( environ['BOSS_SPECTRO_REDUX'], environ['RUN2D'],
+                          '%s' % plate, environ['RUN1D'],
+                          'spZbest-%s-%s.fits' % (plate, plates[plate]) ) )
     # open data file
     idlpath = join( environ['BOSS_SPECTRO_REDUX'], environ['RUN2D'],
                    '%s' % plate, 'spPlate-%s-%s.fits' % (plate, plates[plate]) )
@@ -41,17 +44,36 @@ for plate in plates.keys():
 
     # loop over fibers and keep those classed as gal with zwarn=0
     for i,fiber in enumerate(hdu[1].data.FIBERID):
-        if fiber != 516:
-            if hdu[1].data.ZWARNING[i] == 0:
-                if hdu[1].data.CLASS1[i] == 'ssp_galaxy_glob':
-                    fibers.append(fiber)
-                    zs.append(hdu[1].data.Z1[i])
+        fiber -= 1 # account for 1-based fiber IDs
+        if hdu[1].data.ZWARNING[i] == 0:
+            if hdu[1].data.CLASS[i] == 'GALAXY':
+                #and (hdu[1].data.SUBCLASS[i].strip() == 'STARFORMING' or hdu[1].data.SUBCLASS[i].strip() == 'STARBURST'):
+                fibers.append(i)
+                zs.append(hdu[1].data.Z[i])
 
     # nfibers x nfibers matrix to hold distances
     distmat = np.zeros( (len(fibers), len(fibers)) )
 
     # binary distance matrix
     #binmat = np.zeros( distmat.shape )
+
+'''
+                                                ,  ,
+                                               / \/ \
+                                              (/ //_ \_
+     .-._                                      \||  .  \
+      \  '-._                            _,:__.-"/---\_ \
+ ______/___  '.    .--------------------'~-'--.)__( , )\ \
+`'--.___  _\  /    |        Here Be Dragons  ,'    \)|\ `\|
+     /_.-' _\ \ _:,_                               " ||   (
+   .'__ _.' \'-/,`-~`         Abondon Hope           |/
+       '. ___.> /=,|        All Ye Who Enter         |
+        / .-'/_ )  '---------------------------------'
+         '  ( /(/
+             \\ "
+              '=='
+   
+'''
 
 
     # calculate distance from each fiber to every other fiber
@@ -106,10 +128,24 @@ for plate in plates.keys():
             data2 /= mean2
             sigma2 *= mean2**2
             # convert inverse variance to sigma squared and add in quadrature
-            variance = (1/sigma1_2) + (1/sigma2)
+            try:
+                variance = (1/sigma1_2) + (1/sigma2)
+                distmat[i][j] = distmat[j][i] = np.sum( (data1_2 - data2)**2 /\
+                                                       variance ) / data1.shape[0]
+            except ValueError:
+                '''
+                if len(sigma1_2) < len(sigma2):
+                    for i in range( len(sigma2)-len(sigma1_2) ):
+                        sigma1_2 = np.append(sigma1_2,1e9)
+                        data1_2 = np.append(data1_2, 0)
+                else:
+                    for i in range( len(sigma1_2)-len(sigma2) ):
+                        sigma2 = np.append(sigma2, 1e9)
+                        data2 = np.append(data2, 0)
+                variance = (1/sigma1_2) + (1/sigma2)
+                '''
+                distmat[i,j] = distmat[j][i] = 1e9
             # calculate reduced chi2 as distance
-            distmat[i][j] = distmat[j][i] = np.sum( (data1_2 - data2)**2 /\
-                                                   variance ) / data1.shape[0]
             #if distmat[i][j] < mindist:
                 #binmat[i][j] = 1
     print " "
