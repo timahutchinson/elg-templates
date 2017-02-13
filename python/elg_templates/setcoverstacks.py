@@ -9,6 +9,7 @@ import seaborn as sns
 from astropy.io import fits
 
 from redmonster.datamgr.io2 import read_ndArch
+from _linelist import __linelist__
 
 # Dict of plates and corresponding MJDS
 plates = {8123:56931}
