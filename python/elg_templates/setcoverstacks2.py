@@ -57,7 +57,7 @@ for plate in plates.keys():
     # binary distance matrix
     #binmat = np.zeros( distmat.shape )
 
-'''
+    '''
                                                 ,  ,
                                                / \/ \
                                               (/ //_ \_
@@ -66,14 +66,14 @@ for plate in plates.keys():
  ______/___  '.    .--------------------'~-'--.)__( , )\ \
 `'--.___  _\  /    |        Here Be Dragons  ,'    \)|\ `\|
      /_.-' _\ \ _:,_                               " ||   (
-   .'__ _.' \'-/,`-~`         Abondon Hope           |/
+   .'__ _.' \'-/,`-~`         Abandon Hope           |/
        '. ___.> /=,|        All Ye Who Enter         |
         / .-'/_ )  '---------------------------------'
          '  ( /(/
              \\ "
               '=='
    
-'''
+    '''
 
 
     # calculate distance from each fiber to every other fiber
