@@ -11,6 +11,7 @@ from astropy.io import fits
 from redmonster.datamgr.io2 import read_ndArch
 
 # Dict of plates and corresponding MJDS
+platelist = [6931, 6932, 6933, 8123]
 plates = {6932:56397}
 
 # version of redmonster reductions to use
@@ -159,12 +160,15 @@ for plate in plates.keys():
 
     # Get the archetype indices
     iarchetype = np.nonzero(g.s)[0]
-    print "Number of archetypes: %s\n" % iarchetype.shape
+#print "Number of archetypes: %s\n" % iarchetype.shape
 
     # How many are covered by each archetype?
     n_rep = np.sum(binmat[:, iarchetype], axis=0)
     for i,arch in enumerate(iarchetype):
-        print "Archtype #%s represents %s spectra." % (arch, n_rep[i])
+        if n_rep[i] == 1: pass
+        #print "Archtype #%s represents %s spectra." % (arch, n_rep[i])
+        else: pass
+#print "Archtype #%s represents %s spectra." % (arch, n_rep[i])
 
     # Get instances represented by each archetype
     stacks = [] # place to store stacks

@@ -72,7 +72,7 @@ for plate in plates.keys():
         # loop over upper half of matrix and fill bottom half with symmetry
         for j in range(i, len(fibers)):
             fiber2 = fibers[j]
-            stderr.write("\rTotal: %s i: %s j:%s" % (len(fibers), i+1, j+1) )
+            stderr.write("\rTotal: %s i: %s j:%s" % (len(fibers), (i+1), (j+1)) )
             # convert to rest-frame wavelength
             wave2 = wave / (1+zs[j])
             # crop spectra to only overlapping region
@@ -129,14 +129,21 @@ for plate in plates.keys():
     # How many are covered by each archetype?
     n_rep = np.sum(binmat[:, iarchetype], axis=0)
     for i,arch in enumerate(iarchetype):
-        print "Archtype #%s represents %s spectra." % (arch, n_rep[i])
+        if n_rep[i] == 1:
+            print "Archetype #%s represents %s spectra." % (arch, n_rep[i])
+        elif n_rep[i] > 1:
+            print "Archetype #%s represents %i spectra." % (arch, n_rep[i])
 
     # Get instances represented by each archetype
     stacks = [] # place to store stacks
     all_counts = []
     restwave = 10**(2.6990 + np.arange(20000) * 0.0001)
+    redshifts = []
+    j = -1
     for i in xrange(iarchetype.size):
         if n_rep[i] > 1:
+            j += 1
+            redshifts.append([])
             this_stack = np.zeros(20000)
             counts = np.zeros(20000)
             # binary vector of which spectra are represented by this archetype
@@ -150,6 +157,7 @@ for plate in plates.keys():
                 wave0 = np.abs(restwave - this_wave[0]).argmin()
                 this_stack[wave0:wave0+fiberlen] += hduidl[0].data[fiber-1]
                 counts[wave0:wave0+fiberlen] += 1
+                redshifts[j].append(zs[fiberind])
             this_stack /= counts
             stacks.append(this_stack)
             all_counts.append(counts)
