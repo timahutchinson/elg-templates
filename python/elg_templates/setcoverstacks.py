@@ -139,11 +139,14 @@ for plate in plates.keys():
     all_counts = []
     restwave = 10**(2.6990 + np.arange(20000) * 0.0001)
     redshifts = []
+    fibnums = []
+    archfibs = []
     j = -1
     for i in xrange(iarchetype.size):
         if n_rep[i] > 1:
             j += 1
             redshifts.append([])
+            fibnums.append([])
             this_stack = np.zeros(20000)
             counts = np.zeros(20000)
             # binary vector of which spectra are represented by this archetype
@@ -158,9 +161,11 @@ for plate in plates.keys():
                 this_stack[wave0:wave0+fiberlen] += hduidl[0].data[fiber-1]
                 counts[wave0:wave0+fiberlen] += 1
                 redshifts[j].append(zs[fiberind])
+                fibnums[j].append(fiber)
             this_stack /= counts
             stacks.append(this_stack)
             all_counts.append(counts)
+            archfibs.append( fibers[iarchetype[i]] )
 
     # Crop stacks to regions with at least XXX% of max counts
     mastercounts = []
